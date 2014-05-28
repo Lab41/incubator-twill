@@ -116,7 +116,7 @@ public class ZKDiscoveryService implements DiscoveryService, DiscoveryServiceCli
   }
 
   /**
-   * Constructs ZKDiscoveryService using the provided zookeeper client for storing service registry under namepsace.
+   * Constructs ZKDiscoveryService using the provided zookeeper client for storing service registry under namespace.
    * @param zkClient of zookeeper quorum
    * @param namespace under which the service registered would be stored in zookeeper.
    *                  If namespace is {@code null}, no namespace will be used.
