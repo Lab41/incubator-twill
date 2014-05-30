@@ -286,7 +286,7 @@ public final class ZKOperations {
    * @param zkClient The {@link ZKClient} to use.
    * @param path A ZooKeeper path to watch for existent.
    */
-  private static void watchExists(final ZKClient zkClient, final String path, final SettableFuture<String> completion) {
+  public static void watchExists(final ZKClient zkClient, final String path, final SettableFuture<String> completion) {
     Futures.addCallback(zkClient.exists(path, new Watcher() {
       @Override
       public void process(WatchedEvent event) {
