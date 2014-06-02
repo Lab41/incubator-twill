@@ -281,6 +281,12 @@ public final class ZKOperations {
     return resultFuture;
   }
 
+  public static ListenableFuture<String> watchExists(final ZKClient zkClient, final String path) {
+    SettableFuture<String> completion = SettableFuture.create();
+    watchExists(zkClient, path, completion);
+    return completion;
+  }
+
   /**
    * Watch for the given path until it exists.
    * @param zkClient The {@link ZKClient} to use.
