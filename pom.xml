@@ -135,6 +135,8 @@
         <module>twill-api</module>
         <module>twill-zookeeper</module>
         <module>twill-discovery-core</module>
+        <module>twill-synchronization-api</module>
+        <module>twill-synchronization-core</module>
         <module>twill-core</module>
         <module>twill-yarn</module>
         <module>twill-ext</module>
