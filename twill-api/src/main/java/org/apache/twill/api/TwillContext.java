@@ -94,4 +94,12 @@ public interface TwillContext extends ServiceAnnouncer, DiscoveryServiceClient {
    * @return A {@link org.apache.twill.common.Cancellable} object representing this candidate's participation.
    */
   Cancellable electLeader(String name, ElectionHandler participantHandler);
+
+  /*
+   * Create a distributed double barrier.
+   *
+   * @param name the name of the barrier
+   * @return A {@link org.apache.twill.synchronization.DoubleBarrier} object.
+   */
+  Cancellable registerDoubleBarrier(String name, int parties);
 }
