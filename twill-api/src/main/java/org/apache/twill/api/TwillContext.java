@@ -17,6 +17,7 @@
  */
 package org.apache.twill.api;
 
+import org.apache.twill.common.Cancellable;
 import org.apache.twill.discovery.DiscoveryServiceClient;
 import org.apache.twill.discovery.ServiceDiscovered;
 
@@ -85,4 +86,12 @@ public interface TwillContext extends ServiceAnnouncer, DiscoveryServiceClient {
    */
   @Override
   ServiceDiscovered discover(String name);
+
+  /**
+   * Create a distributed double barrier.
+   *
+   * @param name the name of the barrier
+   * @return A {@link org.apache.twill.synchronization.DoubleBarrier} object.
+   */
+  Cancellable registerDoubleBarrier(String name, int parties);
 }

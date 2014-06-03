@@ -42,6 +42,7 @@ import org.apache.twill.internal.RunIds;
 import org.apache.twill.internal.ServiceMain;
 import org.apache.twill.internal.json.ArgumentsCodec;
 import org.apache.twill.internal.json.TwillSpecificationAdapter;
+import org.apache.twill.synchronization.ZKSynchronizationService;
 import org.apache.twill.zookeeper.RetryStrategies;
 import org.apache.twill.zookeeper.ZKClient;
 import org.apache.twill.zookeeper.ZKClientService;
@@ -86,6 +87,7 @@ public final class TwillContainerMain extends ServiceMain {
                                  RetryStrategies.fixDelay(1, TimeUnit.SECONDS))));
 
     ZKDiscoveryService discoveryService = new ZKDiscoveryService(zkClientService);
+    ZKSynchronizationService synchronizationService = new ZKSynchronizationService(zkClientService);
 
     TwillSpecification twillSpec = loadTwillSpec(twillSpecFile);
     renameLocalFiles(twillSpec.getRunnables().get(runnableName));
@@ -97,7 +99,10 @@ public final class TwillContainerMain extends ServiceMain {
       runId, appRunId, containerInfo.getHost(),
       arguments.getRunnableArguments().get(runnableName).toArray(new String[0]),
       arguments.getArguments().toArray(new String[0]),
-      runnableSpec, instanceId, discoveryService, discoveryService, instanceCount,
+      runnableSpec, instanceId,
+      discoveryService, discoveryService,
+      synchronizationService, synchronizationService,
+      instanceCount,
       containerInfo.getMemoryMB(), containerInfo.getVirtualCores()
     );
 

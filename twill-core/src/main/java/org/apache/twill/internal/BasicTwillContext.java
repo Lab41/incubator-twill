@@ -25,6 +25,8 @@ import org.apache.twill.discovery.Discoverable;
 import org.apache.twill.discovery.DiscoveryService;
 import org.apache.twill.discovery.DiscoveryServiceClient;
 import org.apache.twill.discovery.ServiceDiscovered;
+import org.apache.twill.synchronization.SynchronizationService;
+import org.apache.twill.synchronization.SynchronizationServiceClient;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -43,6 +45,8 @@ public final class BasicTwillContext implements TwillContext {
   private final int instanceId;
   private final DiscoveryService discoveryService;
   private final DiscoveryServiceClient discoveryServiceClient;
+  private final SynchronizationService synchronizationService;
+  private final SynchronizationServiceClient synchronizationServiceClient;
   private final int allowedMemoryMB;
   private final int virtualCores;
   private volatile int instanceCount;
@@ -50,6 +54,8 @@ public final class BasicTwillContext implements TwillContext {
   public BasicTwillContext(RunId runId, RunId appRunId, InetAddress host, String[] args, String[] appArgs,
                            TwillRunnableSpecification spec, int instanceId,
                            DiscoveryService discoveryService, DiscoveryServiceClient discoveryServiceClient,
+                           SynchronizationService synchronizationService,
+                           SynchronizationServiceClient synchronizationServiceClient,
                            int instanceCount, int allowedMemoryMB, int virtualCores) {
     this.runId = runId;
     this.appRunId = appRunId;
@@ -60,6 +66,8 @@ public final class BasicTwillContext implements TwillContext {
     this.instanceId = instanceId;
     this.discoveryService = discoveryService;
     this.discoveryServiceClient = discoveryServiceClient;
+    this.synchronizationService = synchronizationService;
+    this.synchronizationServiceClient = synchronizationServiceClient;
     this.instanceCount = instanceCount;
     this.allowedMemoryMB = allowedMemoryMB;
     this.virtualCores = virtualCores;
@@ -137,5 +145,10 @@ public final class BasicTwillContext implements TwillContext {
   @Override
   public ServiceDiscovered discover(String name) {
     return discoveryServiceClient.discover(name);
+  }
+
+  @Override
+  public Cancellable registerDoubleBarrier(String name, int parties) {
+    return synchronizationService.registerDoubleBarrier(name, parties);
   }
 }
