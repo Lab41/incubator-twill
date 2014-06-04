@@ -47,14 +47,14 @@ public abstract class SynchronizationServiceTestBase {
             Assert.assertNotNull(barrier);
 
             // Propagate up the timeout exceptions.
-            barrier.enter(5, TimeUnit.SECONDS);
+            barrier.enter(10, TimeUnit.SECONDS);
             postEnterLatch.countDown();
-            Assert.assertTrue(postEnterLatch.await(2, TimeUnit.SECONDS));
+            Assert.assertTrue(postEnterLatch.await(1, TimeUnit.SECONDS));
 
             // Propagate up the timeout exceptions.
-            barrier.leave(5, TimeUnit.SECONDS);
+            barrier.leave(10, TimeUnit.SECONDS);
             postLeaveLatch.countDown();
-            Assert.assertTrue(postLeaveLatch.await(2, TimeUnit.SECONDS));
+            Assert.assertTrue(postLeaveLatch.await(1, TimeUnit.SECONDS));
 
             return null;
           }
@@ -64,7 +64,7 @@ public abstract class SynchronizationServiceTestBase {
     }
 
     for (Future<Void> future: futures) {
-      future.get(30, TimeUnit.SECONDS);
+      future.get(60, TimeUnit.SECONDS);
     }
   }
 
@@ -87,7 +87,7 @@ public abstract class SynchronizationServiceTestBase {
             // Propagate up the timeout exceptions.
 
             try {
-              barrier.enter(5, TimeUnit.SECONDS);
+              barrier.enter(10, TimeUnit.SECONDS);
               Assert.fail();
             } catch (TimeoutException ignored) {
             } catch (BrokenBarrierException ignored) {
@@ -127,14 +127,14 @@ public abstract class SynchronizationServiceTestBase {
             Assert.assertNotNull(barrier);
 
             // Propagate up the timeout exceptions.
-            barrier.enter(5, TimeUnit.SECONDS);
+            barrier.enter(10, TimeUnit.SECONDS);
             postEnterLatch.countDown();
-            Assert.assertTrue(postEnterLatch.await(5, TimeUnit.SECONDS));
+            Assert.assertTrue(postEnterLatch.await(1, TimeUnit.SECONDS));
 
             // Don't let one of the PARTIES exit the barrier.
             if (p != 0) {
               try {
-                barrier.leave(2, TimeUnit.SECONDS);
+                barrier.leave(10, TimeUnit.SECONDS);
                 Assert.fail();
               } catch (TimeoutException ignored) {
               } catch (BrokenBarrierException ignored) {
@@ -150,7 +150,7 @@ public abstract class SynchronizationServiceTestBase {
     }
 
     for (Future<Void> future: futures) {
-      future.get(30, TimeUnit.SECONDS);
+      future.get(60, TimeUnit.SECONDS);
     }
   }
 }
