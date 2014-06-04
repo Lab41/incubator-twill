@@ -19,7 +19,11 @@ package org.apache.twill.yarn;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.Service;
-import org.apache.twill.api.*;
+import org.apache.twill.api.AbstractTwillRunnable;
+import org.apache.twill.api.TwillApplication;
+import org.apache.twill.api.TwillController;
+import org.apache.twill.api.TwillRunner;
+import org.apache.twill.api.TwillSpecification;
 import org.apache.twill.api.logging.PrinterLogHandler;
 import org.apache.twill.common.Services;
 import org.apache.twill.synchronization.DoubleBarrier;
@@ -40,8 +44,8 @@ public final class DoubleBarrierTest extends BaseYarnTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(DoubleBarrierTest.class);
 
-  private static String BARRIER_NAME = "barrier";
-  private static int PARTIES = 2;
+  private static final String BARRIER_NAME = "barrier";
+  private static final int PARTIES = 2;
 
   @Test
   public void testDoubleBarrier() throws InterruptedException, ExecutionException, TimeoutException {
@@ -84,19 +88,16 @@ public final class DoubleBarrierTest extends BaseYarnTest {
 
     @Override
     public void run() {
-      /*
-      DoubleBarrier barrier;
       try {
-        barrier = getContext().getDoubleBarrier(BARRIER_NAME, PARTIES);
-        LOG.debug("entering barrier");
+        DoubleBarrier barrier = getContext().getDoubleBarrier(BARRIER_NAME, PARTIES);
+        LOG.info("entering barrier");
         barrier.enter();
-        LOG.debug("leaving barrier");
+        LOG.info("leaving barrier");
         barrier.leave();
-        LOG.debug("left barrier");
+        LOG.info("left barrier");
       } catch (Exception e) {
         Assert.fail("unexpected exception");
       }
-      */
     }
 
     @Override
