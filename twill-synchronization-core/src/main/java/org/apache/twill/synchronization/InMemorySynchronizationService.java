@@ -27,44 +27,23 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * A simple in memory implementation of {@link SynchronizationService} and @{link SynchronizationServiceClient}.
+ * A simple in memory implementation of {@link SynchronizationService}.
  */
-public class InMemorySynchronizationService implements SynchronizationService, SynchronizationServiceClient {
+public class InMemorySynchronizationService implements SynchronizationService {
 
   private final Map<String, DoubleBarrierWrapper> barriers = Maps.newHashMap();
   private final Lock lock = new ReentrantLock();
 
   @Override
-  public Cancellable registerDoubleBarrier(final String barrierName, int parties) {
+  public DoubleBarrier getDoubleBarrier(String name, int parties) {
     lock.lock();
     try {
-      DoubleBarrierWrapper barrierWrapper = barriers.get(barrierName);
-      if (barrierWrapper == null) {
-        barrierWrapper = new DoubleBarrierWrapper(parties);
-        barriers.put(barrierName, barrierWrapper);
+      DoubleBarrierWrapper barrier = barriers.get(name);
+      if (barrier == null) {
+        barrier = new DoubleBarrierWrapper(parties);
+        barriers.put(name, barrier);
       }
-    } finally {
-      lock.unlock();
-    }
-
-    return new Cancellable() {
-      @Override
-      public void cancel() {
-        lock.lock();
-        try {
-          barriers.remove(barrierName);
-        } finally {
-          lock.unlock();
-        }
-      }
-    };
-  }
-
-  @Override
-  public DoubleBarrier getDoubleBarrier(String barrierName) {
-    lock.lock();
-    try {
-      return barriers.get(barrierName);
+      return barrier;
     } finally {
       lock.unlock();
     }

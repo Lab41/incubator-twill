@@ -19,8 +19,10 @@ package org.apache.twill.api;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import org.apache.twill.api.logging.LogHandler;
+import org.apache.twill.common.Cancellable;
 import org.apache.twill.discovery.Discoverable;
 import org.apache.twill.discovery.ServiceDiscovered;
+import org.apache.twill.synchronization.DoubleBarrier;
 
 /**
  * For controlling a running application.
@@ -40,6 +42,14 @@ public interface TwillController extends ServiceController {
    */
   ServiceDiscovered discoverService(String serviceName);
 
+  /**
+   * Create a distributed double barrier.
+   *
+   * @param name the name of the barrier
+   * @param parties the number of parties waiting at the barrier before it is entered.
+   * @return A {@link org.apache.twill.synchronization.DoubleBarrier} object.
+   */
+  DoubleBarrier getDoubleBarrier(String name, int parties) throws Exception;
 
   /**
    * Changes the number of running instances of a given runnable.

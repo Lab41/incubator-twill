@@ -28,6 +28,7 @@ import org.apache.twill.zookeeper.ZKClient;
 import org.apache.twill.zookeeper.ZKClients;
 import org.apache.twill.zookeeper.ZKOperations;
 import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,12 +61,11 @@ import java.util.concurrent.ExecutionException;
  *   </pre>
  * </blockquote>
  */
-public class ZKSynchronizationService implements SynchronizationService, SynchronizationServiceClient {
+public class ZKSynchronizationService implements SynchronizationService {
   private static final Logger LOG = LoggerFactory.getLogger(ZKSynchronizationService.class);
   private static final String NAMESPACE = "/synchronization";
 
   private final ZKClient zkClient;
-  private final NodeService nodeService;
 
   /**
    * Constructs ZKSynchronizationService using the provided zookeeper client for storing primitives.
@@ -84,80 +84,26 @@ public class ZKSynchronizationService implements SynchronizationService, Synchro
    */
   public ZKSynchronizationService(ZKClient zkClient, String namespace) {
     this.zkClient = namespace == null ? zkClient : ZKClients.namespace(zkClient, namespace);
-    this.nodeService = new NodeService(this.zkClient, CreateMode.PERSISTENT);
-  }
-
-  /**
-   * Registers a {@link DoubleBarrier} in zookeeper.
-   * <p>
-   *   Registering a {@link DoubleBarrier} will create a node &lt;base&gt;/&lt;service-name&gt;
-   *   in zookeeper as a ephemeral node. If the node already exists (timeout associated with emphemeral node creation), 
-   *   then a runtime exception is thrown to make sure that a service with an intent to register is not started without 
-   *   registering. 
-   *   When a runtime exception is thrown, expectation is that the process being started will fail and would be started 
-   *   again by the monitoring service.
-   * </p>
-   * @param barrierName The name of the barrier.
-   * @param parties The number of parties in the barrier.
-   * @return An instance of {@link Cancellable}
-   */
-  @Override
-  public Cancellable registerDoubleBarrier(String barrierName, int parties) {
-    final String path = "/" + barrierName;
-    byte[] data = encode(parties);
-
-    final Cancellable cancellable = nodeService.register(path, data);
-
-    return new Cancellable() {
-      @Override
-      public void cancel() {
-        // Make sure we clean up any broken barriers.
-
-        // TODO: Should we not be doing this? Otherwise we leave behind broken barrier nodes.
-        Futures.getUnchecked(ZKOperations.recursiveDelete(zkClient, path));
-
-        cancellable.cancel();
-      }
-    };
   }
 
   /**
    * Return an instance of {@link DoubleBarrier}.
-   * @param barrierName The name of the barrier.
+   * @param name The name of the barrier.
+   * @param parties the number of parties waiting at the barrier before it is entered.
    * @return An instance of {@link DoubleBarrier}.
    */
   @Override
-  public DoubleBarrier getDoubleBarrier(String barrierName) throws ExecutionException, InterruptedException {
-    final String barrierBase = "/" + barrierName;
+  public DoubleBarrier getDoubleBarrier(String name, int parties) throws ExecutionException, InterruptedException {
+    final String barrierBase = "/" + name;
 
-    final SettableFuture<NodeData> nodeDataFuture = SettableFuture.create();
+    LOG.debug("Getting barrier", barrierBase);
 
-    // Wait until the barrier has been created.
-    Cancellable cancellable = ZKOperations.watchData(zkClient, barrierBase, new ZKOperations.DataCallback() {
-      @Override
-      public void updated(NodeData nodeData) {
-        if (!nodeDataFuture.isDone()) {
-          nodeDataFuture.set(nodeData);
-        }
-      }
-    });
+    // Make sure the barrier has been created.
+    Futures.getUnchecked(ZKOperations.ignoreError(zkClient.create(barrierBase, null, CreateMode.PERSISTENT, true),
+                                                  KeeperException.NodeExistsException.class,
+                                                  null));
 
-    NodeData nodeData = nodeDataFuture.get();
-    cancellable.cancel();
-
-    int parties = decode(nodeData.getData());
     return new ZKDoubleBarrier(ZKClients.namespace(zkClient, barrierBase), parties);
-  }
-
-  private byte[] encode(int parties) {
-    return new Gson().toJson(parties).getBytes(Charsets.UTF_8);
-  }
-
-  private Integer decode(byte[] encoded) {
-    if (encoded == null) {
-      return null;
-    }
-    return new Gson().fromJson(new String(encoded, Charsets.UTF_8), Integer.class);
   }
 }
 

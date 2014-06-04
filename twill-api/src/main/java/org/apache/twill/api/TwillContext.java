@@ -17,16 +17,16 @@
  */
 package org.apache.twill.api;
 
-import org.apache.twill.common.Cancellable;
 import org.apache.twill.discovery.DiscoveryServiceClient;
 import org.apache.twill.discovery.ServiceDiscovered;
+import org.apache.twill.synchronization.SynchronizationService;
 
 import java.net.InetAddress;
 
 /**
  * Represents the runtime context of a {@link TwillRunnable}.
  */
-public interface TwillContext extends ServiceAnnouncer, DiscoveryServiceClient {
+public interface TwillContext extends ServiceAnnouncer, DiscoveryServiceClient, SynchronizationService {
 
   /**
    * Returns the {@link RunId} of this running instance of {@link TwillRunnable}.
