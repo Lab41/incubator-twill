@@ -29,6 +29,7 @@ import org.apache.twill.api.ResourceReport;
 import org.apache.twill.api.RunId;
 import org.apache.twill.api.TwillController;
 import org.apache.twill.api.logging.LogHandler;
+import org.apache.twill.common.Cancellable;
 import org.apache.twill.internal.AbstractTwillController;
 import org.apache.twill.internal.Constants;
 import org.apache.twill.internal.ProcessController;

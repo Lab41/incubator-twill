@@ -17,16 +17,16 @@
  */
 package org.apache.twill.api;
 
-import org.apache.twill.common.Cancellable;
 import org.apache.twill.discovery.DiscoveryServiceClient;
 import org.apache.twill.discovery.ServiceDiscovered;
+import org.apache.twill.synchronization.SynchronizationService;
 
 import java.net.InetAddress;
 
 /**
  * Represents the runtime context of a {@link TwillRunnable}.
  */
-public interface TwillContext extends ServiceAnnouncer, DiscoveryServiceClient {
+public interface TwillContext extends ServiceAnnouncer, DiscoveryServiceClient, SynchronizationService {
 
   /**
    * Returns the {@link RunId} of this running instance of {@link TwillRunnable}.
@@ -94,12 +94,4 @@ public interface TwillContext extends ServiceAnnouncer, DiscoveryServiceClient {
    * @return A {@link org.apache.twill.common.Cancellable} object representing this candidate's participation.
    */
   Cancellable electLeader(String name, ElectionHandler participantHandler);
-
-  /*
-   * Create a distributed double barrier.
-   *
-   * @param name the name of the barrier
-   * @return A {@link org.apache.twill.synchronization.DoubleBarrier} object.
-   */
-  Cancellable registerDoubleBarrier(String name, int parties);
 }

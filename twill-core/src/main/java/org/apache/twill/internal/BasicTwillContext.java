@@ -26,8 +26,8 @@ import org.apache.twill.discovery.Discoverable;
 import org.apache.twill.discovery.DiscoveryService;
 import org.apache.twill.discovery.DiscoveryServiceClient;
 import org.apache.twill.discovery.ServiceDiscovered;
+import org.apache.twill.synchronization.DoubleBarrier;
 import org.apache.twill.synchronization.SynchronizationService;
-import org.apache.twill.synchronization.SynchronizationServiceClient;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -47,7 +47,6 @@ public final class BasicTwillContext implements TwillContext {
   private final DiscoveryService discoveryService;
   private final DiscoveryServiceClient discoveryServiceClient;
   private final SynchronizationService synchronizationService;
-  private final SynchronizationServiceClient synchronizationServiceClient;
   private final int allowedMemoryMB;
   private final int virtualCores;
   private volatile int instanceCount;
@@ -58,7 +57,6 @@ public final class BasicTwillContext implements TwillContext {
                            DiscoveryService discoveryService, DiscoveryServiceClient discoveryServiceClient,
                            ElectionRegistry electionRegistry,
                            SynchronizationService synchronizationService,
-                           SynchronizationServiceClient synchronizationServiceClient,
                            int instanceCount, int allowedMemoryMB, int virtualCores) {
     this.runId = runId;
     this.appRunId = appRunId;
@@ -71,7 +69,6 @@ public final class BasicTwillContext implements TwillContext {
     this.discoveryServiceClient = discoveryServiceClient;
     this.elections = electionRegistry;
     this.synchronizationService = synchronizationService;
-    this.synchronizationServiceClient = synchronizationServiceClient;
     this.instanceCount = instanceCount;
     this.allowedMemoryMB = allowedMemoryMB;
     this.virtualCores = virtualCores;
@@ -157,8 +154,8 @@ public final class BasicTwillContext implements TwillContext {
   }
 
   @Override
-  public Cancellable registerDoubleBarrier(String name, int parties) {
-    return synchronizationService.registerDoubleBarrier(name, parties);
+  public DoubleBarrier getDoubleBarrier(String name, int parties) throws Exception {
+    return synchronizationService.getDoubleBarrier(name, parties);
   }
 
   /**
