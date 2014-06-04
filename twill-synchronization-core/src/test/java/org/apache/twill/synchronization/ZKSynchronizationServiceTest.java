@@ -43,9 +43,7 @@ public class ZKSynchronizationServiceTest extends SynchronizationServiceTestBase
   }
 
   @Override
-  protected Map.Entry<SynchronizationService, SynchronizationServiceClient> create() {
-    SynchronizationService synchronizationService = new ZKSynchronizationService(zkClient);
-    SynchronizationServiceClient synchronizationServiceClient = new ZKSynchronizationService(zkClient);
-    return Maps.immutableEntry(synchronizationService, synchronizationServiceClient);
+  protected SynchronizationService create() {
+    return new ZKSynchronizationService(zkClient);
   }
 }

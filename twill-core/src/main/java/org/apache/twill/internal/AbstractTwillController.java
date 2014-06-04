@@ -39,6 +39,10 @@ import org.apache.twill.internal.state.SystemMessages;
 import org.apache.twill.kafka.client.FetchedMessage;
 import org.apache.twill.kafka.client.KafkaClientService;
 import org.apache.twill.kafka.client.KafkaConsumer;
+import org.apache.twill.synchronization.DoubleBarrier;
+import org.apache.twill.synchronization.SynchronizationService;
+import org.apache.twill.synchronization.SynchronizationServiceClient;
+import org.apache.twill.synchronization.ZKSynchronizationService;
 import org.apache.twill.zookeeper.ZKClient;
 import org.apache.twill.zookeeper.ZKClients;
 import org.slf4j.Logger;
@@ -59,6 +63,7 @@ public abstract class AbstractTwillController extends AbstractZKServiceControlle
   private final Queue<LogHandler> logHandlers;
   private final KafkaClientService kafkaClient;
   private final DiscoveryServiceClient discoveryServiceClient;
+  private final SynchronizationService synchronizationService;
   private volatile Cancellable logCancellable;
 
   public AbstractTwillController(RunId runId, ZKClient zkClient, Iterable<LogHandler> logHandlers) {
@@ -66,6 +71,7 @@ public abstract class AbstractTwillController extends AbstractZKServiceControlle
     this.logHandlers = new ConcurrentLinkedQueue<LogHandler>();
     this.kafkaClient = new ZKKafkaClientService(ZKClients.namespace(zkClient, "/" + runId.getId() + "/kafka"));
     this.discoveryServiceClient = new ZKDiscoveryService(zkClient);
+    this.synchronizationService = new ZKSynchronizationService(zkClient);
     Iterables.addAll(this.logHandlers, logHandlers);
   }
 
@@ -102,6 +108,11 @@ public abstract class AbstractTwillController extends AbstractZKServiceControlle
   @Override
   public final ServiceDiscovered discoverService(String serviceName) {
     return discoveryServiceClient.discover(serviceName);
+  }
+
+  @Override
+  public DoubleBarrier getDoubleBarrier(String name, int parties) throws Exception {
+    return synchronizationService.getDoubleBarrier(name, parties);
   }
 
   @Override

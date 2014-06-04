@@ -2,6 +2,7 @@ package org.apache.twill.synchronization;
 
 import com.google.common.collect.Lists;
 import org.apache.twill.common.Cancellable;
+import org.apache.twill.zookeeper.ZKOperations;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -22,32 +23,27 @@ import java.util.concurrent.TimeoutException;
 public abstract class SynchronizationServiceTestBase {
 
   private static String BARRIER_NAME = "barrier";
+  private static int PARTIES = 3;
 
-  protected abstract Map.Entry<SynchronizationService, SynchronizationServiceClient> create();
+  protected abstract SynchronizationService create();
 
   @Test
   public void testMultiplePartiesEnterAndLeave() throws Exception {
-    Map.Entry<SynchronizationService, SynchronizationServiceClient> entry = create();
-    SynchronizationService synchronizationService = entry.getKey();
-    final SynchronizationServiceClient synchronizationServiceClient = entry.getValue();
+    final SynchronizationService synchronizationService = create();
 
-    // Register a barrier.
-    int parties = 3;
-    Cancellable cancellable = synchronizationService.registerDoubleBarrier(BARRIER_NAME, parties);
-
-    ExecutorService executor = Executors.newFixedThreadPool(parties);
+    ExecutorService executor = Executors.newFixedThreadPool(PARTIES);
     List<Future<Void>> futures = Lists.newArrayList();
 
-    final CountDownLatch postEnterLatch = new CountDownLatch(parties);
-    final CountDownLatch postLeaveLatch = new CountDownLatch(parties);
+    final CountDownLatch postEnterLatch = new CountDownLatch(PARTIES);
+    final CountDownLatch postLeaveLatch = new CountDownLatch(PARTIES);
 
-    for (int party = 0; party < parties; ++party) {
+    for (int party = 0; party < PARTIES; ++party) {
       Future<Void> future = executor.submit(
         new Callable<Void>() {
           @Override
           public Void call() throws Exception {
             // Get the barrier.
-            DoubleBarrier barrier = synchronizationServiceClient.getDoubleBarrier(BARRIER_NAME);
+            DoubleBarrier barrier = synchronizationService.getDoubleBarrier(BARRIER_NAME, PARTIES);
             Assert.assertNotNull(barrier);
 
             // Propagate up the timeout exceptions.
@@ -70,31 +66,22 @@ public abstract class SynchronizationServiceTestBase {
     for (Future<Void> future: futures) {
       future.get(30, TimeUnit.SECONDS);
     }
-
-    // Remove the barrier.
-    cancellable.cancel();
   }
 
   @Test
   public void testFailingToEnterBarrier() throws Exception {
-    Map.Entry<SynchronizationService, SynchronizationServiceClient> entry = create();
-    SynchronizationService synchronizationService = entry.getKey();
-    final SynchronizationServiceClient synchronizationServiceClient = entry.getValue();
+    final SynchronizationService synchronizationService = create();
 
-    // Register a barrier.
-    int parties = 3;
-    Cancellable cancellable = synchronizationService.registerDoubleBarrier(BARRIER_NAME, parties);
-
-    ExecutorService executor = Executors.newFixedThreadPool(parties);
+    ExecutorService executor = Executors.newFixedThreadPool(PARTIES);
     List<Future<Void>> futures = Lists.newArrayList();
 
-    for (int party = 0; party < parties - 1; ++party) {
+    for (int party = 0; party < PARTIES - 1; ++party) {
       Future<Void> future = executor.submit(
         new Callable<Void>() {
           @Override
           public Void call() throws Exception {
             // Get the barrier.
-            DoubleBarrier barrier = synchronizationServiceClient.getDoubleBarrier(BARRIER_NAME);
+            DoubleBarrier barrier = synchronizationService.getDoubleBarrier(BARRIER_NAME, PARTIES);
             Assert.assertNotNull(barrier);
 
             // Propagate up the timeout exceptions.
@@ -117,27 +104,18 @@ public abstract class SynchronizationServiceTestBase {
     for (Future<Void> future: futures) {
       future.get(10, TimeUnit.SECONDS);
     }
-
-    // Remove the barrier.
-    cancellable.cancel();
   }
 
   @Test
   public void testFailingToLeaveBarrier() throws Exception {
-    Map.Entry<SynchronizationService, SynchronizationServiceClient> entry = create();
-    SynchronizationService synchronizationService = entry.getKey();
-    final SynchronizationServiceClient synchronizationServiceClient = entry.getValue();
+    final SynchronizationService synchronizationService = create();
 
-    // Register a barrier.
-    int parties = 3;
-    Cancellable cancellable = synchronizationService.registerDoubleBarrier(BARRIER_NAME, parties);
-
-    ExecutorService executor = Executors.newFixedThreadPool(parties);
+    ExecutorService executor = Executors.newFixedThreadPool(PARTIES);
     List<Future<Void>> futures = Lists.newArrayList();
 
-    final CountDownLatch postEnterLatch = new CountDownLatch(parties);
+    final CountDownLatch postEnterLatch = new CountDownLatch(PARTIES);
 
-    for (int party = 0; party < parties; ++party) {
+    for (int party = 0; party < PARTIES; ++party) {
       final int p = party;
 
       Future<Void> future = executor.submit(
@@ -145,7 +123,7 @@ public abstract class SynchronizationServiceTestBase {
           @Override
           public Void call() throws Exception {
             // Get the barrier.
-            DoubleBarrier barrier = synchronizationServiceClient.getDoubleBarrier(BARRIER_NAME);
+            DoubleBarrier barrier = synchronizationService.getDoubleBarrier(BARRIER_NAME, PARTIES);
             Assert.assertNotNull(barrier);
 
             // Propagate up the timeout exceptions.
@@ -153,7 +131,7 @@ public abstract class SynchronizationServiceTestBase {
             postEnterLatch.countDown();
             Assert.assertTrue(postEnterLatch.await(5, TimeUnit.SECONDS));
 
-            // Don't let one of the parties exit the barrier.
+            // Don't let one of the PARTIES exit the barrier.
             if (p != 0) {
               try {
                 barrier.leave(2, TimeUnit.SECONDS);
@@ -174,8 +152,5 @@ public abstract class SynchronizationServiceTestBase {
     for (Future<Void> future: futures) {
       future.get(30, TimeUnit.SECONDS);
     }
-
-    // Remove the barrier.
-    cancellable.cancel();
   }
 }

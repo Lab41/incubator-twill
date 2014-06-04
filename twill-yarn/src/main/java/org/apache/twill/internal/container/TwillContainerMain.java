@@ -101,7 +101,7 @@ public final class TwillContainerMain extends ServiceMain {
       arguments.getArguments().toArray(new String[0]),
       runnableSpec, instanceId,
       discoveryService, discoveryService,
-      synchronizationService, synchronizationService,
+      synchronizationService,
       instanceCount,
       containerInfo.getMemoryMB(), containerInfo.getVirtualCores()
     );

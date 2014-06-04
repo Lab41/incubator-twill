@@ -10,8 +10,7 @@ import java.util.Map;
 public class InMemorySynchronizationServiceTest extends SynchronizationServiceTestBase {
 
   @Override
-  protected Map.Entry<SynchronizationService, SynchronizationServiceClient> create() {
-    SynchronizationService synchronizationService = new InMemorySynchronizationService();
-    return Maps.immutableEntry(synchronizationService, (SynchronizationServiceClient) synchronizationService);
+  protected SynchronizationService create() {
+    return new InMemorySynchronizationService();
   }
 }
