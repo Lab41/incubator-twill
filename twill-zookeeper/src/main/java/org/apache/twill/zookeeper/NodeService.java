@@ -67,7 +67,7 @@ public class NodeService {
     this.nodes = HashMultimap.create();
     this.lock = new ReentrantLock();
     this.retryExecutor = Executors.newSingleThreadScheduledExecutor(
-      Threads.createDaemonThreadFactory("zk-discovery-retry"));
+      Threads.createDaemonThreadFactory("zk-node-service-retry"));
     this.zkClient.addConnectionWatcher(createConnectionWatcher());
   }
 
