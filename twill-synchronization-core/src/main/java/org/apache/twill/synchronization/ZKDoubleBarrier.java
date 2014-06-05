@@ -79,7 +79,7 @@ final class ZKDoubleBarrier implements DoubleBarrier {
     String readyBase = "/" + readyPath;
 
     // Step 2: watch for the /ready path to be created.
-    ListenableFuture<String> existsFuture = ZKOperations.watchExists(zkClient, readyPath);
+    ListenableFuture<String> existsFuture = ZKOperations.watchExists(zkClient, readyBase);
 
     // Step 3: Create our process node.
     zkClient.create(ourBase, null, CreateMode.EPHEMERAL, true).get();
