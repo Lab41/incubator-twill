@@ -28,6 +28,8 @@ import org.apache.twill.zookeeper.ZKClient;
 import org.apache.twill.zookeeper.ZKOperations;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -42,6 +44,8 @@ import java.util.concurrent.TimeoutException;
  * barriers.
  */
 final class ZKDoubleBarrier implements DoubleBarrier {
+
+  private static final Logger LOG = LoggerFactory.getLogger(ZKDoubleBarrier.class);
 
   private static final String READY_NODE = "ready";
 
@@ -182,8 +186,17 @@ final class ZKDoubleBarrier implements DoubleBarrier {
       // Step 6: goto step 1.
     }
 
-    // Finally, delete the ready node.
+    LOG.debug("Deleting {}{}", zkClient.getConnectString(), readyBase);
+
+    // Delete the ready node.
     Futures.getUnchecked(ZKOperations.ignoreError(zkClient.delete(readyBase),
+      KeeperException.NoNodeException.class,
+      null));
+
+    LOG.debug("Deleting {}", zkClient.getConnectString());
+
+    // Finally, try to clean up our barrier directory.
+    Futures.getUnchecked(ZKOperations.ignoreError(zkClient.delete(""),
       KeeperException.NoNodeException.class,
       null));
   }
