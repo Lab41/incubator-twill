@@ -28,7 +28,6 @@ import org.apache.twill.discovery.DiscoveryServiceClient;
 import org.apache.twill.discovery.ServiceDiscovered;
 import org.apache.twill.synchronization.DoubleBarrier;
 import org.apache.twill.synchronization.SynchronizationService;
-import org.apache.twill.synchronization.SynchronizationServiceClient;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
