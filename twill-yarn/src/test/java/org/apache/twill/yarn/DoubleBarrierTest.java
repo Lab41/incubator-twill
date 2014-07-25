@@ -45,7 +45,7 @@ public final class DoubleBarrierTest extends BaseYarnTest {
   private static final Logger LOG = LoggerFactory.getLogger(DoubleBarrierTest.class);
 
   private static final String BARRIER_NAME = "barrier";
-  private static final int PARTIES = 2;
+  private static final int PARTIES = 1;
 
   @Test
   public void testDoubleBarrier() throws InterruptedException, ExecutionException, TimeoutException {
@@ -58,7 +58,7 @@ public final class DoubleBarrierTest extends BaseYarnTest {
 
     ListenableFuture<Service.State> completion = Services.getCompletionFuture(controller);
     try {
-      completion.get(60, TimeUnit.SECONDS);
+      completion.get(30, TimeUnit.SECONDS);
     } finally {
       controller.stopAndWait();
     }
@@ -74,7 +74,6 @@ public final class DoubleBarrierTest extends BaseYarnTest {
       return TwillSpecification.Builder.with()
         .setName("DoubleBarrierApp")
         .withRunnable()
-          .add(new DoubleBarrierRunnable()).noLocalFiles()
           .add(new DoubleBarrierRunnable()).noLocalFiles()
         .anyOrder()
         .build();

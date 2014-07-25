@@ -97,7 +97,11 @@ final class ZKDoubleBarrier implements DoubleBarrier {
     int count = (children != null) ? children.size() : 0;
     if (count < parties) {
       // Step 5: If not enough processes are in the barrier, wait for the ready node to be created.
-      existsFuture.get(maxWait, unit);
+      if (unit == null) {
+        existsFuture.get();
+      } else {
+        existsFuture.get(maxWait, unit);
+      }
     } else {
       LOG.debug("creating {}{}", zkClient.getConnectString(), readyBase);
 
