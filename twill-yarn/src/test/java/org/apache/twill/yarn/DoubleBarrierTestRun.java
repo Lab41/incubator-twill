@@ -40,9 +40,9 @@ import java.util.concurrent.TimeoutException;
 /**
  * Test for ability to use double barriers {@link org.apache.twill.api.TwillContext}.
  */
-public final class DoubleBarrierTest extends BaseYarnTest {
+public final class DoubleBarrierTestRun extends BaseYarnTest {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DoubleBarrierTest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DoubleBarrierTestRun.class);
 
   private static final String BARRIER_NAME = "barrier";
   private static final int PARTIES = 1;

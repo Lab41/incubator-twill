@@ -28,6 +28,7 @@ import org.junit.runners.Suite;
                       ContainerSizeTestRun.class,
                       DebugTestRun.class,
                       DistributeShellTestRun.class,
+                      DoubleBarrierTestRun.class,
                       EchoServerTestRun.class,
                       FailureRestartTestRun.class,
                       InitializeFailTestRun.class,
