@@ -119,7 +119,7 @@ public abstract class SynchronizationServiceTestBase {
     }
 
     for (Future<Void> future: futures) {
-      future.get(10, TimeUnit.SECONDS);
+      future.get(60, TimeUnit.SECONDS);
     }
   }
 

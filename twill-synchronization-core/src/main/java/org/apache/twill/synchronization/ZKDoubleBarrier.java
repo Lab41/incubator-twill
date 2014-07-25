@@ -85,6 +85,8 @@ final class ZKDoubleBarrier implements DoubleBarrier {
     // Step 2: watch for the /ready path to be created.
     ListenableFuture<String> existsFuture = ZKOperations.watchExists(zkClient, readyBase);
 
+    LOG.debug("creating {}{}", zkClient.getConnectString(), ourBase);
+
     // Step 3: Create our process node.
     zkClient.create(ourBase, null, CreateMode.EPHEMERAL, true).get();
 
@@ -97,6 +99,8 @@ final class ZKDoubleBarrier implements DoubleBarrier {
       // Step 5: If not enough processes are in the barrier, wait for the ready node to be created.
       existsFuture.get(maxWait, unit);
     } else {
+      LOG.debug("creating {}{}", zkClient.getConnectString(), readyBase);
+
       // Step 6: Create the ready node.
       ZKOperations.ignoreError(
         zkClient.create(readyBase, null, CreateMode.EPHEMERAL, true),
@@ -150,6 +154,8 @@ final class ZKDoubleBarrier implements DoubleBarrier {
           throw new IllegalStateException(String.format("Last path (%s) is not ours (%s)", lastPath, ourPath));
         }
 
+        LOG.debug("Deleting master {}{}", zkClient.getConnectString(), ourBase);
+
         // We're the last path, so delete ourselves and break out of the loop.
         ZKOperations.ignoreError(zkClient.delete(ourBase), KeeperException.NoNodeException.class, null).get();
         break;
@@ -160,11 +166,13 @@ final class ZKDoubleBarrier implements DoubleBarrier {
       if (isLowestNode) {
         // Step 4: If we are the lowest node in the list, wait on the highest process in the list.
 
-        path = children.get(count - 1);
+        path = "/" + children.get(count - 1);
       } else {
-        // Step 5: Delete ourselves if it exists and wait on the lowest process in the list.
+        // Step 5: Delete ourselves if we exist and wait on the lowest process in the list.
 
-        path = children.get(0);
+        path = "/" + children.get(0);
+
+        LOG.debug("Deleting child {}{}", zkClient.getConnectString(), ourBase);
 
         // Delete our path.
         ZKOperations.ignoreError(zkClient.delete(ourBase), KeeperException.NoNodeException.class, null).get();
@@ -177,7 +185,9 @@ final class ZKDoubleBarrier implements DoubleBarrier {
         if (thisWaitMs <= 0) {
           throw new TimeoutException();
         } else {
-          ZKOperations.watchDeleted(zkClient, path).get(elapsed, TimeUnit.MILLISECONDS);
+          LOG.debug("Waiting {} for {}{}", ourBase, zkClient.getConnectString(), path);
+
+          ZKOperations.watchDeleted(zkClient, path).get(thisWaitMs, TimeUnit.MILLISECONDS);
         }
       } else {
         Futures.getUnchecked(ZKOperations.watchDeleted(zkClient, path));
