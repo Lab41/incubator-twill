@@ -197,7 +197,7 @@ public class ZKClientTest {
 
         KillZKSession.kill(client.getZooKeeperSupplier().get(), zkServer.getConnectionStr(), 10000);
 
-        Assert.assertTrue(expireReconnectLatch.await(10, TimeUnit.SECONDS));
+        Assert.assertTrue(expireReconnectLatch.await(30, TimeUnit.SECONDS));
 
         client.delete("/expireRewatch");
         Assert.assertEquals(Watcher.Event.EventType.NodeDeleted, events.poll(4, TimeUnit.SECONDS));
