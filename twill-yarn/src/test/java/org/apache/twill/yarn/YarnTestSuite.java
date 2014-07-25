@@ -25,17 +25,19 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-                      EchoServerTestRun.class,
-                      ResourceReportTestRun.class,
-                      TaskCompletedTestRun.class,
+                      ContainerSizeTestRun.class,
+                      DebugTestRun.class,
                       DistributeShellTestRun.class,
-                      LocalFileTestRun.class,
+                      EchoServerTestRun.class,
                       FailureRestartTestRun.class,
-                      ProvisionTimeoutTestRun.class,
+                      InitializeFailTestRun.class,
+                      LocalFileTestRun.class,
                       LogHandlerTestRun.class,
-                      SessionExpireTestRun.class,
+                      ProvisionTimeoutTestRun.class,
+                      ResourceReportTestRun.class,
                       ServiceDiscoveryTestRun.class,
-                      DebugTestRun.class
+                      SessionExpireTestRun.class,
+                      TaskCompletedTestRun.class
                     })
 public final class YarnTestSuite {
 
