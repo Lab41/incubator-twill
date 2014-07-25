@@ -17,10 +17,6 @@
  */
 package org.apache.twill.synchronization;
 
-import com.google.common.collect.Maps;
-
-import java.util.Map;
-
 /**
  * Test memory based synchronization service.
  */
