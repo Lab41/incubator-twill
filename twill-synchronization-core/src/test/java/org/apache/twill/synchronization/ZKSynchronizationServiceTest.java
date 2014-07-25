@@ -17,7 +17,6 @@
  */
 package org.apache.twill.synchronization;
 
-import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.Futures;
 import org.apache.twill.common.Services;
 import org.apache.twill.internal.zookeeper.InMemoryZKServer;
@@ -26,11 +25,8 @@ import org.apache.twill.zookeeper.ZKClientService;
 import org.apache.twill.zookeeper.ZKClientServices;
 import org.apache.twill.zookeeper.ZKClients;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**

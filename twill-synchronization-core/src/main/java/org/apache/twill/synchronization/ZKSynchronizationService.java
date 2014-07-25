@@ -17,13 +17,7 @@
  */
 package org.apache.twill.synchronization;
 
-import com.google.common.base.Charsets;
 import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.SettableFuture;
-import com.google.gson.Gson;
-import org.apache.twill.common.Cancellable;
-import org.apache.twill.zookeeper.NodeData;
-import org.apache.twill.zookeeper.NodeService;
 import org.apache.twill.zookeeper.ZKClient;
 import org.apache.twill.zookeeper.ZKClients;
 import org.apache.twill.zookeeper.ZKOperations;

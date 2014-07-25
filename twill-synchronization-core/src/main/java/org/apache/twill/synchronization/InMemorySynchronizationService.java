@@ -18,7 +18,6 @@
 package org.apache.twill.synchronization;
 
 import com.google.common.collect.Maps;
-import org.apache.twill.common.Cancellable;
 
 import java.util.Map;
 import java.util.concurrent.CyclicBarrier;
